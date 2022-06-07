@@ -5,26 +5,47 @@ using Newtonsoft.Json;
 var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
 
 using var producer = new ProducerBuilder<Null, string>(config).Build();
+Timer timer;
+int i = 1;
 
 try
 {
-    string? state;
-    while ((state = Console.ReadLine()) != null)
+    timer = new Timer(Te2ste, null, TimeSpan.Zero, TimeSpan.FromSeconds(.001));
+    while (true)
     {
 
-        var response = await producer.ProduceAsync("weather-topic",
-            new Message<Null, string>
-            {
-                Value = JsonConvert.SerializeObject(
-                new Weather(state, 70))
-            });
-        Console.WriteLine(response.Value);
     }
-
 }
 catch (ProduceException<Null, string> ex)
 {
-    Console.WriteLine(ex.Message);
+    throw ex;
+}
+
+void Te2ste(object? state)
+{
+    string? response = "NY";
+    try
+    {
+        producer.ProduceAsync("weather-topic",
+          new Message<Null, string>
+          {
+              Value = JsonConvert.SerializeObject(
+              new Weather(response, i))
+          });
+
+        Console.WriteLine($"{response} + {i}");
+        i++;
+
+    }
+    catch (Exception ex)
+    {
+
+        throw new Exception(ex.Message);
+    }
+
+    //Console.WriteLine("AgoraVai");
+
 }
 
 public record Weather(string state, int Temperature);
+
